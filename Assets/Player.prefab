@@ -176,6 +176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 10
   jumpSpeed: 10
+  isGrounded: 0
 --- !u!124 &124496260114722868
 Behaviour:
   m_ObjectHideFlags: 1
