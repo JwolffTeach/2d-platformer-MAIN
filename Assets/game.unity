@@ -435,7 +435,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4780783934932844, guid: 29af673c59e287a40b695aa4ded126fe, type: 2}
       propertyPath: m_LocalScale.x
-      value: 8.05
+      value: 51.48
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 29af673c59e287a40b695aa4ded126fe, type: 2}
@@ -595,8 +595,9 @@ MonoBehaviour:
   isGrounded: 0
   runAnimationSpeed: 4
   dashing: 0
-  dashMultiplier: 5
-  dashLength: 0.2
+  dashSpeed: 3
+  dashDistance: 0.4
+  dashAnimationSpeed: 5
 --- !u!50 &1580711337
 Rigidbody2D:
   serializedVersion: 4
@@ -716,7 +717,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4780783934932844, guid: 29af673c59e287a40b695aa4ded126fe, type: 2}
       propertyPath: m_LocalPosition.y
-      value: -3.4
+      value: -1.12
       objectReference: {fileID: 0}
     - target: {fileID: 4780783934932844, guid: 29af673c59e287a40b695aa4ded126fe, type: 2}
       propertyPath: m_LocalPosition.z
@@ -902,15 +903,16 @@ EdgeCollider2D:
   m_Offset: {x: 0, y: 0}
   m_EdgeRadius: 0
   m_Points:
-  - {x: -0.3711624, y: 0.2609787}
-  - {x: -0.32039833, y: 0.3313378}
-  - {x: -0.2253151, y: 0.40873158}
-  - {x: -0.14264679, y: 0.45710576}
-  - {x: -0.0044088364, y: 0.47901154}
-  - {x: 0.14820576, y: 0.44662178}
-  - {x: 0.29921627, y: 0.3551618}
-  - {x: 0.37838268, y: 0.2576567}
-  - {x: 0.40750122, y: 0.18499756}
+  - {x: -0.3125372, y: 0.25658178}
+  - {x: -0.29841423, y: 0.31668156}
+  - {x: -0.21212482, y: 0.3999378}
+  - {x: -0.13238811, y: 0.4409839}
+  - {x: -0.002943039, y: 0.45995843}
+  - {x: 0.14527416, y: 0.4363624}
+  - {x: 0.28548145, y: 0.3521474}
+  - {x: 0.29481983, y: 0.3478337}
+  - {x: 0.36958885, y: 0.25619102}
+  - {x: 0.3781891, y: 0.20991313}
 --- !u!1001 &2137835442
 Prefab:
   m_ObjectHideFlags: 0
