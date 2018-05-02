@@ -41,6 +41,7 @@ GameObject:
   - component: {fileID: 61894363166434414}
   - component: {fileID: 50398037767438694}
   - component: {fileID: 114415640251255728}
+  - component: {fileID: 95555439901422776}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -95,7 +96,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -163,6 +164,23 @@ AudioListener:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1335271538502528}
   m_Enabled: 1
+--- !u!95 &95555439901422776
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1735355173540020}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 77ad646634a851145ac80178efe01dac, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114415640251255728
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -177,6 +195,7 @@ MonoBehaviour:
   moveSpeed: 10
   jumpSpeed: 10
   isGrounded: 0
+  runAnimationSpeed: 4
 --- !u!124 &124496260114722868
 Behaviour:
   m_ObjectHideFlags: 1

@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Platform_Top
   - Platform_Bottom
+  - Enemy_Hit
+  - Enemy_Danger
   layers:
   - Default
   - TransparentFX

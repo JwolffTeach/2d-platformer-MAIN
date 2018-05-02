@@ -62,6 +62,16 @@ public class Player : MonoBehaviour {
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
+        // Did we hit an enemy's head?
+        if(collision.transform.tag == "Enemy_Hit") {
+            Destroy(collision.transform.parent.gameObject);
+            rb.velocity = new Vector2(rb.velocity.x, jumpSpeed / 2);
+        }
+        else if (collision.transform.tag == "Enemy_Danger") {
+            print("Uh oh! You just got hit by the enemy!");
+        }
+        else { // Probably just on a platform.
             isGrounded = true;
+        }
     }
 }
