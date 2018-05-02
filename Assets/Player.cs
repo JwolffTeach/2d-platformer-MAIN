@@ -13,8 +13,14 @@ public class Player : MonoBehaviour {
     private Animator animator;
     private SpriteRenderer sprite;
     [SerializeField] float runAnimationSpeed = 4;
-    
-	void Start () {
+
+    // Ability stuff
+    [SerializeField] bool dashing = false;
+    [SerializeField] float dashMultiplier;
+    [SerializeField] float dashLength;
+
+
+    void Start () {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
@@ -50,8 +56,25 @@ public class Player : MonoBehaviour {
 
     private void MovementControl() {
         float h = Input.GetAxis("Horizontal");
-        rb.velocity = new Vector2(h * moveSpeed, rb.velocity.y);
-        print(rb.velocity.x);
+        if (Input.GetKeyDown("g") && !dashing) { // We dash if we aren't dashing and hit the "g" key
+            StartCoroutine(doDash(h, dashLength));
+        }
+        if (!dashing) { // We're not dashing, so move normal.
+            rb.velocity = new Vector2(h * moveSpeed, rb.velocity.y);
+        }
+        //else {
+        //   rb.velocity = new Vector2(h * moveSpeed, rb.velocity.y);
+        //}
+    }
+
+    IEnumerator doDash(float h, float waitTime) {
+        print("doing dash?");
+        dashing = true;
+        animator.SetBool("Dashing", dashing);
+        rb.velocity = new Vector2(h * moveSpeed * dashMultiplier, rb.velocity.y);
+        yield return new WaitForSeconds(waitTime);
+        dashing = false;
+        animator.SetBool("Dashing", dashing);
     }
 
     private void JumpControl() {
