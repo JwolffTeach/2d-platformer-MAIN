@@ -5,11 +5,13 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
 
+    // Movement Stuff
     Rigidbody2D rb;
     [SerializeField] float moveSpeed;
     [SerializeField] float jumpSpeed;
     public bool isGrounded = false;
 
+    // Animator Stuff
     private Animator animator;
     private SpriteRenderer sprite;
     [SerializeField] float runAnimationSpeed = 4;
@@ -32,6 +34,20 @@ public class Player : MonoBehaviour {
         setAnimations();
     }
 
+    private void OnCollisionEnter2D(Collision2D collision) {
+        // Did we hit an enemy's head?
+        if (collision.transform.tag == "Enemy_Hit") {
+            Destroy(collision.transform.parent.gameObject);
+            rb.velocity = new Vector2(rb.velocity.x, jumpSpeed / 2);
+        }
+        else if (collision.transform.tag == "Enemy_Danger") {
+            print("Uh oh! You just got hit by the enemy!");
+        }
+        else { // Probably just on a platform.
+            isGrounded = true;
+        }
+    }
+
     private void setAnimations() {
         animator.SetBool("isGrounded", isGrounded);
         animator.SetFloat("Speed", Mathf.Abs(rb.velocity.x));
@@ -46,9 +62,8 @@ public class Player : MonoBehaviour {
             animator.speed = runAnimationSpeed;
         }
         else {
-            animator.speed = 1;
+            animator.speed = 1; // Set animation speed back to 0 if not dashing or running.
         }
-        // Increase the animation speed when we are running.
         animator.SetFloat("vSpeed", rb.velocity.y);
     }
 
@@ -86,20 +101,6 @@ public class Player : MonoBehaviour {
         if (isGrounded && Input.GetButtonDown("Jump")) {
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
             isGrounded = false;
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision) {
-        // Did we hit an enemy's head?
-        if(collision.transform.tag == "Enemy_Hit") {
-            Destroy(collision.transform.parent.gameObject);
-            rb.velocity = new Vector2(rb.velocity.x, jumpSpeed / 2);
-        }
-        else if (collision.transform.tag == "Enemy_Danger") {
-            print("Uh oh! You just got hit by the enemy!");
-        }
-        else { // Probably just on a platform.
-            isGrounded = true;
         }
     }
 }
