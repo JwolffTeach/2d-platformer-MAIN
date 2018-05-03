@@ -6,7 +6,6 @@ using UnityEngine;
 public class SoundManager : MonoBehaviour {
 
     public Sound[] sounds;
-    public List<Sound> currentSounds;
 
     // Use this for initialization
     void Awake () {
@@ -23,7 +22,6 @@ public class SoundManager : MonoBehaviour {
         s = FindSound(name, s);
         if (s != null) {
             s.source.Play();
-            currentSounds.Add(s);
         }
         else {
             Debug.LogError("Cannot find sound " + name);

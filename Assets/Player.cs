@@ -9,6 +9,8 @@ public class Player : MonoBehaviour {
     [SerializeField] float moveSpeed;
     [SerializeField] float jumpSpeed;
     public bool isGrounded = false;
+    public bool gotHit = false;
+    public float recoveryTime;
 
     private Animator animator;
     private SpriteRenderer sprite;
@@ -39,7 +41,7 @@ public class Player : MonoBehaviour {
         }
 
         // Increase the animation speed when we are running.
-        if (Mathf.Abs(rb.velocity.x) >= 10) {
+        if (Mathf.Abs(Input.GetAxis("Horizontal")) >= 1) {
             animator.speed = runAnimationSpeed;
             if (isGrounded) {
                 FindObjectOfType<SoundManager>().PlayLooping("PlayerRun");
@@ -53,7 +55,19 @@ public class Player : MonoBehaviour {
 
     private void MovementControl() {
         float h = Input.GetAxis("Horizontal");
-        rb.velocity = new Vector2(h * moveSpeed, rb.velocity.y);
+        if (!gotHit) {
+            rb.velocity = new Vector2(h * moveSpeed, rb.velocity.y);
+        }
+        else {
+            if(rb.velocity.x < 0) { // We're moving left from a bounce
+                rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + 0.5f, -moveSpeed, 0), rb.velocity.y); 
+            }
+            else if (rb.velocity.x > 0) {
+                if (rb.velocity.x < 0) { // We're moving left from a bounce
+                    rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + 0.5f, 0, moveSpeed), rb.velocity.y);
+                }
+            }
+        }
     }
 
     private void JumpControl() {
@@ -68,14 +82,24 @@ public class Player : MonoBehaviour {
     private void OnCollisionEnter2D(Collision2D collision) {
         // Did we hit an enemy's head?
         if(collision.transform.tag == "Enemy_Hit") {
-            Destroy(collision.transform.parent.gameObject);
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed / 2);
+            collision.gameObject.SendMessage("GotHit", this.gameObject);
         }
         else if (collision.transform.tag == "Enemy_Danger") {
+            rb.AddRelativeForce(Vector2.left * 1000, ForceMode2D.Force);
+            //rb.AddRelativeForce(Vector2.left * 100); // Knockback effect
+            StartCoroutine("HitRecovery");
+            FindObjectOfType<SoundManager>().Play("PlayerDamage");
             print("Uh oh! You just got hit by the enemy!");
         }
         else { // Probably just on a platform.
             isGrounded = true;
         }
+    }
+
+    IEnumerator HitRecovery() {
+        gotHit = true;
+        yield return new WaitForSeconds(recoveryTime);
+        gotHit = false;
     }
 }

@@ -301,6 +301,11 @@ Prefab:
       propertyPath: runSound
       value: 
       objectReference: {fileID: 8300000, guid: bee32f7265afc33488963219728649d7, type: 3}
+    - target: {fileID: 114415640251255728, guid: 20ad19d0843ef8546aeec3c44e12f460,
+        type: 2}
+      propertyPath: recoveryTime
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 20ad19d0843ef8546aeec3c44e12f460, type: 2}
   m_IsPrefabParent: 0
@@ -340,9 +345,23 @@ MonoBehaviour:
   - name: PlayerRun
     clip: {fileID: 8300000, guid: ea03f5a89d73914429bdae9de3f042fb, type: 3}
     volume: 0.8
+    pitch: 3
+    source: {fileID: 0}
+  - name: CoinCollect
+    clip: {fileID: 8300000, guid: 6dad908a1d63770459d7319acd4c01f7, type: 3}
+    volume: 0.8
     pitch: 1
     source: {fileID: 0}
-  something: 0
+  - name: EnemyDeath
+    clip: {fileID: 8300000, guid: 39ebdf9ababcb254a9e98d3a6bf2cc31, type: 3}
+    volume: 0.8
+    pitch: 1
+    source: {fileID: 0}
+  - name: PlayerDamage
+    clip: {fileID: 8300000, guid: d28235d984b35264b9c833213bef18a2, type: 3}
+    volume: 0.8
+    pitch: 1
+    source: {fileID: 0}
 --- !u!4 &896144701
 Transform:
   m_ObjectHideFlags: 0
@@ -713,6 +732,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1977069811}
   - component: {fileID: 1977069812}
+  - component: {fileID: 1977069813}
   m_Layer: 0
   m_Name: Hit
   m_TagString: Enemy_Hit
@@ -757,6 +777,17 @@ EdgeCollider2D:
   - {x: 0.29921627, y: 0.3551618}
   - {x: 0.37838268, y: 0.2576567}
   - {x: 0.40750122, y: 0.18499756}
+--- !u!114 &1977069813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1977069810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fa81a205b45e9845940b3fb696a62fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2137835442
 Prefab:
   m_ObjectHideFlags: 0
