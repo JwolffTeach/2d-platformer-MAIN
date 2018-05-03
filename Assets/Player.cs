@@ -13,8 +13,8 @@ public class Player : MonoBehaviour {
     private Animator animator;
     private SpriteRenderer sprite;
     [SerializeField] float runAnimationSpeed = 4;
-    
-	void Start () {
+
+    void Start () {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
@@ -41,6 +41,9 @@ public class Player : MonoBehaviour {
         // Increase the animation speed when we are running.
         if (Mathf.Abs(rb.velocity.x) >= 10) {
             animator.speed = runAnimationSpeed;
+            if (isGrounded) {
+                FindObjectOfType<SoundManager>().PlayLooping("PlayerRun");
+            }
         }
         else {
             animator.speed = 1;
@@ -51,13 +54,14 @@ public class Player : MonoBehaviour {
     private void MovementControl() {
         float h = Input.GetAxis("Horizontal");
         rb.velocity = new Vector2(h * moveSpeed, rb.velocity.y);
-        print(rb.velocity.x);
     }
 
     private void JumpControl() {
         if (isGrounded && Input.GetButtonDown("Jump")) {
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
             isGrounded = false;
+            FindObjectOfType<SoundManager>().Play("PlayerJump");
+            // Play Jump Sound
         }
     }
 
