@@ -37,21 +37,32 @@ public class Player : MonoBehaviour {
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
-        // Did we hit an enemy's head?
-        if (collision.transform.tag == "Enemy_Hit") {
-            rb.velocity = new Vector2(rb.velocity.x, jumpSpeed / 2);
-            collision.gameObject.SendMessage("GotHit", this.gameObject);
+        string otherTag = collision.collider.tag;
+        string thisTag = collision.otherCollider.tag;
+        if(otherTag.Contains("Platform")){ // Did we hit a platform?
+            if (otherTag.Contains("Top")) {
+                isGrounded = true;
+            }
         }
-        else if (collision.transform.tag == "Enemy_Danger") {
-            rb.AddRelativeForce(Vector2.left * 1000, ForceMode2D.Force);
-            //rb.AddRelativeForce(Vector2.left * 100); // Knockback effect
-            StartCoroutine("HitRecovery");
-            FindObjectOfType<SoundManager>().Play("PlayerDamage");
-            print("Uh oh! You just got hit by the enemy!");
+        else if (otherTag.Contains("Enemy")){ // Did we hit an enemy?
+            if (otherTag.Contains("Hit")) { // Did we land on top of it?
+                rb.velocity = new Vector2(rb.velocity.x, jumpSpeed / 2);
+                collision.collider.SendMessage("GotHit", this.gameObject);
+            }
+            else if (otherTag.Contains("Danger")) { // It probably hit us.
+                BodyCollision();
+            }
         }
-        else { // Probably just on a platform.
-            isGrounded = true;
+        else {
+            Debug.LogError("Unable to parse collider tags. Collision: " + collision.otherCollider.tag + " and " + collision.collider.tag);
         }
+    }
+
+    private void BodyCollision() {
+        rb.AddRelativeForce(Vector2.left * 1000, ForceMode2D.Force);
+        StartCoroutine("HitRecovery");
+        FindObjectOfType<SoundManager>().Play("PlayerDamage");
+        print("Uh oh! You just got hit by the enemy!");
     }
 
     private void setAnimations() {
@@ -87,17 +98,27 @@ public class Player : MonoBehaviour {
     
     private void MovementControl() {
         float h = Input.GetAxis("Horizontal");
+
         if (!gotHit) {
-            rb.velocity = new Vector2(h * moveSpeed, rb.velocity.y);
+            if (Input.GetKeyDown("g") && !dashing) { // We dash if we aren't dashing and hit the "g" key
+                StartCoroutine(doDash(h, dashDistance));
+            }
+            if (!dashing) { // We're not dashing, so move normal.
+                rb.velocity = new Vector2(h * moveSpeed, rb.velocity.y);
+            }
         }
         else {
+            MovementRecovery();
+        }
+    }
+
+    private void MovementRecovery() {
+        if (rb.velocity.x < 0) { // We're moving left from a bounce
+            rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + 0.5f, -moveSpeed, 0), rb.velocity.y);
+        }
+        else if (rb.velocity.x > 0) {
             if (rb.velocity.x < 0) { // We're moving left from a bounce
-                rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + 0.5f, -moveSpeed, 0), rb.velocity.y);
-            }
-            else if (rb.velocity.x > 0) {
-                if (rb.velocity.x < 0) { // We're moving left from a bounce
-                    rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + 0.5f, 0, moveSpeed), rb.velocity.y);
-                }
+                rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + 0.5f, 0, moveSpeed), rb.velocity.y);
             }
         }
     }
@@ -110,6 +131,7 @@ public class Player : MonoBehaviour {
 
     IEnumerator doDash(float h, float waitTime) {
         dashing = true;
+        FindObjectOfType<SoundManager>().PlayLooping("PlayerDash");
         isGrounded = true; // Set this to true so we can dash in the air.
         animator.SetBool("Dashing", dashing);
         rb.velocity = new Vector2(h * moveSpeed * dashSpeed, rb.velocity.y);
