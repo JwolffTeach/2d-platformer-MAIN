@@ -10,6 +10,8 @@ public class Player : MonoBehaviour {
     [SerializeField] float moveSpeed;
     [SerializeField] float jumpSpeed;
     public bool isGrounded = false;
+    public bool gotHit = false;
+    public float recoveryTime;
 
     // Animator Stuff
     private Animator animator;
@@ -37,10 +39,14 @@ public class Player : MonoBehaviour {
     private void OnCollisionEnter2D(Collision2D collision) {
         // Did we hit an enemy's head?
         if (collision.transform.tag == "Enemy_Hit") {
-            Destroy(collision.transform.parent.gameObject);
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed / 2);
+            collision.gameObject.SendMessage("GotHit", this.gameObject);
         }
         else if (collision.transform.tag == "Enemy_Danger") {
+            rb.AddRelativeForce(Vector2.left * 1000, ForceMode2D.Force);
+            //rb.AddRelativeForce(Vector2.left * 100); // Knockback effect
+            StartCoroutine("HitRecovery");
+            FindObjectOfType<SoundManager>().Play("PlayerDamage");
             print("Uh oh! You just got hit by the enemy!");
         }
         else { // Probably just on a platform.
@@ -58,13 +64,15 @@ public class Player : MonoBehaviour {
         if (dashing) {
             animator.speed = dashAnimationSpeed;
         }
-        else if(Mathf.Abs(rb.velocity.x) >= 10) { // Increase the animation speed when we are running.
+        else if (Mathf.Abs(Input.GetAxis("Horizontal")) >= 1) {
             animator.speed = runAnimationSpeed;
+            if (isGrounded) {
+                FindObjectOfType<SoundManager>().PlayLooping("PlayerRun");
+            }
         }
         else {
-            animator.speed = 1; // Set animation speed back to 0 if not dashing or running.
+            animator.speed = 1;
         }
-        animator.SetFloat("vSpeed", rb.velocity.y);
     }
 
     private void setSpriteDirection() {
@@ -76,15 +84,28 @@ public class Player : MonoBehaviour {
             sprite.flipX = true;    // Face Left
         }
     }
-
+    
     private void MovementControl() {
         float h = Input.GetAxis("Horizontal");
-        if (Input.GetKeyDown("g") && !dashing) { // We dash if we aren't dashing and hit the "g" key
-            StartCoroutine(doDash(h, dashDistance));
-        }
-        if (!dashing) { // We're not dashing, so move normal.
+        if (!gotHit) {
             rb.velocity = new Vector2(h * moveSpeed, rb.velocity.y);
         }
+        else {
+            if (rb.velocity.x < 0) { // We're moving left from a bounce
+                rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + 0.5f, -moveSpeed, 0), rb.velocity.y);
+            }
+            else if (rb.velocity.x > 0) {
+                if (rb.velocity.x < 0) { // We're moving left from a bounce
+                    rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + 0.5f, 0, moveSpeed), rb.velocity.y);
+                }
+            }
+        }
+    }
+
+    IEnumerator HitRecovery() {
+        gotHit = true;
+        yield return new WaitForSeconds(recoveryTime);
+        gotHit = false;
     }
 
     IEnumerator doDash(float h, float waitTime) {
@@ -101,6 +122,7 @@ public class Player : MonoBehaviour {
         if (isGrounded && Input.GetButtonDown("Jump")) {
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
             isGrounded = false;
+            FindObjectOfType<SoundManager>().Play("PlayerJump");
         }
     }
 }
