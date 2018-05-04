@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Coin : MonoBehaviour {
+public class EnemyHit : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
@@ -11,11 +11,11 @@ public class Coin : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
 
-    private void OnTriggerEnter2D(Collider2D collision) {
-        FindObjectOfType<SoundManager>().Play("CoinCollect");
-        Destroy(gameObject);
+    }
+
+    void GotHit(GameObject collision) {
+        FindObjectOfType<SoundManager>().Play("EnemyDeath");
+        Destroy(transform.parent.gameObject);
     }
 }
