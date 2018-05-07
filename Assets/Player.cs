@@ -54,10 +54,15 @@ public class Player : MonoBehaviour {
         }
         else if (otherTag.Contains("Enemy")){ // Did we hit an enemy?
             if (otherTag.Contains("Hit")) { // Did we land on top of it?
-                rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
-                collision.collider.SendMessage("GotHit", this.gameObject);
+                if (thisTag.Contains("Feet")) {
+                    rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
+                    collision.collider.SendMessage("GotHit", this.gameObject);
+                }
+                else { // We take dmg cuz we hit with a our body and not feet.
+                    BodyCollision();
+                }
             }
-            else if (otherTag.Contains("Danger")) { // It probably hit us.
+            else { // It probably hit us.
                 BodyCollision();
             }
         }
