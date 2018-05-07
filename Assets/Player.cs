@@ -2,8 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
+
+    // Player stats
+    int hp = 3;
 
     // Movement Stuff
     Rigidbody2D rb;
@@ -24,6 +28,9 @@ public class Player : MonoBehaviour {
     [SerializeField] float dashDistance;
     [SerializeField] float dashAnimationSpeed;
 
+    // UI things
+    [SerializeField] Text hpText;
+
     void Start () {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
@@ -33,7 +40,8 @@ public class Player : MonoBehaviour {
 	void Update () {
         MovementControl();
         JumpControl();
-        setAnimations();
+        SetAnimations();
+        SetUI();
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
@@ -46,7 +54,7 @@ public class Player : MonoBehaviour {
         }
         else if (otherTag.Contains("Enemy")){ // Did we hit an enemy?
             if (otherTag.Contains("Hit")) { // Did we land on top of it?
-                rb.velocity = new Vector2(rb.velocity.x, jumpSpeed / 2);
+                rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
                 collision.collider.SendMessage("GotHit", this.gameObject);
             }
             else if (otherTag.Contains("Danger")) { // It probably hit us.
@@ -61,21 +69,20 @@ public class Player : MonoBehaviour {
     private void BodyCollision() {
         rb.AddRelativeForce(Vector2.left * 1000, ForceMode2D.Force);
         StartCoroutine("HitRecovery");
-        FindObjectOfType<SoundManager>().Play("PlayerDamage");
         print("Uh oh! You just got hit by the enemy!");
     }
 
-    private void setAnimations() {
+    private void SetAnimations() {
         animator.SetBool("isGrounded", isGrounded);
         animator.SetFloat("Speed", Mathf.Abs(rb.velocity.x));
 
-        setSpriteDirection();
+        SetSpriteDirection();
 
         // Set animation speed to something specific if we're dashing.
         if (dashing) {
             animator.speed = dashAnimationSpeed;
         }
-        else if (Mathf.Abs(Input.GetAxis("Horizontal")) >= 1) {
+        else if (Mathf.Abs(rb.velocity.x) >= moveSpeed) {
             animator.speed = runAnimationSpeed;
             if (isGrounded) {
                 FindObjectOfType<SoundManager>().PlayLooping("PlayerRun");
@@ -86,7 +93,7 @@ public class Player : MonoBehaviour {
         }
     }
 
-    private void setSpriteDirection() {
+    private void SetSpriteDirection() {
         // Check if we are facing left or right, change the sprite direction accordingly.
         if (rb.velocity.x >= 0) {    // Moving Right
             sprite.flipX = false;   // Face Right
@@ -101,7 +108,7 @@ public class Player : MonoBehaviour {
 
         if (!gotHit) {
             if (Input.GetKeyDown("g") && !dashing) { // We dash if we aren't dashing and hit the "g" key
-                StartCoroutine(doDash(h, dashDistance));
+                StartCoroutine(DoDash(h, dashDistance));
             }
             if (!dashing) { // We're not dashing, so move normal.
                 rb.velocity = new Vector2(h * moveSpeed, rb.velocity.y);
@@ -125,17 +132,21 @@ public class Player : MonoBehaviour {
 
     IEnumerator HitRecovery() {
         gotHit = true;
+        hp -= 1;
+        FindObjectOfType<SoundManager>().Play("PlayerDamage");
         yield return new WaitForSeconds(recoveryTime);
         gotHit = false;
     }
 
-    IEnumerator doDash(float h, float waitTime) {
+    IEnumerator DoDash(float h, float waitTime) {
         dashing = true;
-        FindObjectOfType<SoundManager>().PlayLooping("PlayerDash");
         isGrounded = true; // Set this to true so we can dash in the air.
-        animator.SetBool("Dashing", dashing);
         rb.velocity = new Vector2(h * moveSpeed * dashSpeed, rb.velocity.y);
+        animator.SetBool("Dashing", dashing);
+        FindObjectOfType<SoundManager>().PlayLooping("PlayerDash");
+
         yield return new WaitForSeconds(waitTime);
+
         dashing = false;
         animator.SetBool("Dashing", dashing);
     }
@@ -146,5 +157,9 @@ public class Player : MonoBehaviour {
             isGrounded = false;
             FindObjectOfType<SoundManager>().Play("PlayerJump");
         }
+    }
+
+    private void SetUI() {
+        hpText.text = "Health: " + hp;
     }
 }
