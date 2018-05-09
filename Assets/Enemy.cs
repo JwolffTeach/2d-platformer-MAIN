@@ -56,7 +56,8 @@ public class Enemy : MonoBehaviour {
 
     IEnumerator delayJump() {
         yield return new WaitForSeconds(jumpTime);
-        GetComponent<Rigidbody2D>().AddForce(transform.up * jumpStrength, ForceMode2D.Impulse);
+        Vector3 randomDirection = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(0f, 1f), 0);
+        GetComponent<Rigidbody2D>().AddForce(randomDirection * jumpStrength, ForceMode2D.Impulse);
         triggerJump = false;
         grounded = false;
     }
